@@ -15,10 +15,7 @@ export class MainView extends Phaser.GameObjects.Container {
   addWindow() {
     let x = Phaser.Math.Between(0, 850);
     let y = Phaser.Math.Between(70, 475);
-    let tab = this.scene.add
-      .image(0, 0, TEXTURE, "window.png")
-      .setOrigin(0)
-      .setInteractive();
+    let tab = this.scene.add.image(0, 0, TEXTURE, "window.png").setOrigin(0);
     let close = this.scene.add
       .image(120, 5, TEXTURE, "close.png")
       .setOrigin(0)
@@ -29,13 +26,14 @@ export class MainView extends Phaser.GameObjects.Container {
       .setInteractive();
 
     this.container = this.scene.add.container(x, y, [tab, close, minimize]);
-    // this.container.setSize(tab.width, tab.height);
-    const inputShape = new Phaser.Geom.Rectangle(0, 0, 100, 100);
-    this.container.setInteractive(inputShape, () => {
-      console.log("esim xi");
-    });
+    this.container.setInteractive(
+      new Phaser.Geom.Rectangle(0, 0, tab.width, tab.height),
+      Phaser.Geom.Rectangle.Contains
+    );
+    this.scene.input.setDraggable(this.container);
+    // this.container.on("pointerdown", this.dragStart, this);
 
-    this.container.on("pointerdown", this.dragStart, this);
+    this.scene.input.on("drag", this._onDrag, this);
 
     // close.on("pointerdown", function() {
     //   close.off("clicked", clickHandler);
@@ -74,25 +72,30 @@ export class MainView extends Phaser.GameObjects.Container {
     this.i++;
   }
 
-  dragStart(pointer, targets) {
-    console.warn("down");
-
-    this.scene.off("pointerdown", this.dragStart, this);
-    this.dragObj = targets[0];
-    this.scene.on("pointermove", this.doDrag, this);
-    this.scene.on("pointerup", this.stopDrag, this);
+  _onDrag(pointer, gameObject, dragX, dragY) {
+    gameObject.x = dragX;
+    gameObject.y = dragY;
   }
 
-  doDrag(pointer) {
-    this.dragObj.x = pointer.x;
-    this.dragObj.y = pointer.y;
-  }
+  // dragStart(pointer, targets) {
+  //   console.warn("down");
 
-  stopDrag(pointer, targets) {
-    this.scene.on("pointerdown", this.dragStart, this);
-    this.scene.off("pointermove", this.doDrag, this);
-    this.scene.off("pointerup", this.stopDrag, this);
-  }
+  //   this.scene.off("pointerdown", this.dragStart, this);
+  //   this.dragObj = targets[0];
+  //   this.scene.on("pointermove", this.doDrag, this);
+  //   this.scene.on("pointerup", this.stopDrag, this);
+  // }
+
+  // doDrag(pointer) {
+  //   this.dragObj.x = pointer.x;
+  //   this.dragObj.y = pointer.y;
+  // }
+
+  // stopDrag(pointer, targets) {
+  //   this.scene.on("pointerdown", this.dragStart, this);
+  //   this.scene.off("pointermove", this.doDrag, this);
+  //   this.scene.off("pointerup", this.stopDrag, this);
+  // }
 
   mainImagesEvents() {
     this.button.on("pointerdown", this.addWindow, this);
@@ -133,9 +136,7 @@ export class MainView extends Phaser.GameObjects.Container {
       .image(0, 0, TEXTURE, "button.png")
       .setOrigin(0)
       .setInteractive();
-    this.bottomLine = this.scene.add
-      .image(0, 550, TEXTURE, "bottomLine.png")
-      .setOrigin(0);
+    this.bottomLine = this.scene.add.image(0, 550, TEXTURE, "bottomLine.png").setOrigin(0);
     this.startButton = this.scene.add
       .image(0, 550, TEXTURE, "start.png")
       .setOrigin(0)
